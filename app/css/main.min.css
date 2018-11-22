@@ -50,20 +50,33 @@ a {
 
 /*      and reset         */
 .tami {
-  width: 200px;
+  display: inline-block;
+  width: 250px;
   padding: 10px;
-  margin: 0 auto;
+  margin: 50px 20px 0 20px;
   text-align: center;
-  border: 1px solid #000; }
+  border: 1px solid rgba(0, 0, 0, 0.418);
+  cursor: pointer; }
   .tami h2 {
     margin-bottom: 20px; }
+
+.tami-active {
+  border: 1px solid rgba(252, 2, 2, 0.418); }
+
+.tami:hover {
+  border: 1px solid black; }
 
 .emoji {
   background-image: url(./../jmg/emoji-2074153_960_720.png);
   width: 200px;
   height: 200px;
-  background-position: -33px -30px;
+  background-position: -30px -30px;
   background-repeat: no-repeat; }
+
+#timer {
+  display: block;
+  margin: 0 auto;
+  color: red; }
 
 .indicators {
   display: -webkit-box;

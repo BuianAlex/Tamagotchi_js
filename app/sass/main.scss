@@ -13,19 +13,18 @@
     }
 }
 .tami-active{
-    border: 1px solid rgba(252, 2, 2, 0.418);
+    border: 1px solid rgba(102, 252, 2, 0.8);
+}
+.tami-active{
+    border: 1px solid rgba(102, 252, 2, 1);
 }
 .tami:hover{
-    border: 1px solid rgba(0, 0, 0, 1);
+    
 
 }
 .emoji{
-
-    background-image: url(./../jmg/emoji-2074153_960_720.png);
-    width: 200px;
-    height: 200px;
-    background-position: -30px -30px;
-    background-repeat: no-repeat;
+    font-size: 70px;
+    margin-bottom: 2rem; 
 }
 #timer{
     display: block;

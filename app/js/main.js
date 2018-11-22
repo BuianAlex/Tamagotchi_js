@@ -21,20 +21,24 @@ class Tami{
             health: {icon: '❤️', value: '100'},
             fullness:{icon: '🍔', value: '100'},
             strength: {icon: '💪', value: '100'},
-            happiness️️: {icon: '🎈', value: '100'},
+            happiness️️: {icon: '🎈', value: '101'},
         }
-        this.tamiShow();
-
+        this.action = {
+            sleep: false,
+            feed: false,
+            play: false,
+            work: false,
+        }
+        this.tamiShow();   
       }
     tamiShow(){        
-        
-
         let main = document.getElementById("app");
         var tamiView = document.createElement("div");
         tamiView.className = "tami";
         ///set active
         tamiView.addEventListener("click", function(){
-            activeTami = this.getAttribute("id")
+            let active = this.getAttribute("id");
+            Tami.setActive(active);            
             let allTami = document.getElementsByClassName('tami');
                 Array.from(allTami).forEach(function(element) {
                 element.classList.remove("tami-active");
@@ -53,6 +57,7 @@ class Tami{
 
         var face = document.createElement("div");
         face.className = "emoji";
+        face.innerHTML='😸';
 
         var lifeTimer = document.createElement("span");
         lifeTimer.setAttribute("id", `timer${this.id }`);
@@ -73,6 +78,7 @@ class Tami{
         main.appendChild(tamiView);
         this.lifeTimer(1);
     }  
+   
     lifeTimer(params) {
         let sec = 0;
         let id = this.id;
@@ -83,43 +89,92 @@ class Tami{
             let timerView = document.getElementById(`timer${id}`);
             if(timerView){
                 timerView.innerHTML= sec.toHHMMSS();
-                setTimeout(timer.bind(), 1000);
+                setTimeout(timer, 1000);
             }                         
         }
         setTimeout(timer, 1000);
-              
     }
 
     dieTami(){
-        
+        if(this.id==activeTami){            
+            Tami.setActive();
+        }        
         clearTimeout();
-        document.getElementById(this.id).remove();
-        
+        document.getElementById(this.id).remove();        
     }
+    switchAction(active){
+        Object.keys(this.action).map(function(objectKey, index) {
+            this.action[objectKey]=false;
+        });
+        this.action[active] = true;
+    }
+    
     static health(sec,id){
-        if(sec%3===0){
-            let clon = document.getElementById(id);console.log(clon);
-            if(clon){
-                tami[id].indicators.health.value -= 3;
-                if(tami[id].indicators.health.value<90){
-                    Tami.killTami(id);
-                } 
-            
-            
-                clon.childNodes[3].childNodes[0].innerHTML=tami[id].indicators.health.icon+tami[id].indicators.health.value;
-            }
-            
-        }      
+        if(typeof tami[id] === 'object'){
+            if(sec%3===0 &&  !tami[id].action.sleep){
+                let clon = document.getElementById(id);
+                if(clon){
+                    tami[id].indicators.health.value -= 3;
+                    if(tami[id].indicators.health.value<0){
+                        Tami.killTami(id);
+                    }
+                    else{
+                        Tami.emoji(id);
+                        clon.childNodes[3].childNodes[0].innerHTML=tami[id].indicators.health.icon+tami[id].indicators.health.value;
+                    }                
+                }           
+            }      
+        }
+        
     }
 
-    static killTami(name){
-        
-        
-        
-            tami[name].dieTami();
-            delete tami[name];
-           // tami.splice(name, 1);        
-      
+    static emoji (id){
+        let clon = document.getElementById(id);
+        if(clon){
+            if(tami[id].indicators.health.value>=100 && tami[id].indicators.fullness.value>=100 && tami[id].indicators.strength.value>=100 && tami[id].indicators.happiness️️.value>100  ) {
+                clon.childNodes[1].innerHTML= '😻'; //Heart Eyes Cat
+            }
+            if(tami[id].indicators.health.value<100 && tami[id].indicators.health.value>80 ){
+                clon.childNodes[1].innerHTML= '😸';  //    Smiling Eyes         
+            }
+            if(tami[id].indicators.health.value<=80 && tami[id].indicators.health.value>40 ){
+                clon.childNodes[1].innerHTML= '🐱';  // Cat Face            
+            }
+            if(tami[id].indicators.health.value<=40 && tami[id].indicators.health.value>20 ){
+                clon.childNodes[1].innerHTML= '🙀';
+            }
+            if(tami[id].indicators.health.value<=20 && tami[id].indicators.health.value>3 ){
+                clon.childNodes[1].innerHTML= '😿';
+            }
+            if(tami[id].indicators.health.value<=3){
+                clon.childNodes[1].innerHTML= '💀';
+            }
+            if(tami[id].action.sleep) {
+                clon.childNodes[1].innerHTML= '🛏️';
+            }
+            
+        }
+    }
+
+    static setActive(id){
+        if(id){           
+             activeTami = id;
+        document.getElementById('active-name').innerHTML=tami[id].name;
+        }
+        else{
+            activeTami = ' ';
+            document.getElementById('active-name').innerHTML=' ';
+        }
+    }
+
+    static goSleep(id){          
+        tami[id].action.sleep = !tami[id].action.sleep;       
+        Tami.emoji (id);
+    }
+
+    static killTami(name){        
+        tami[name].dieTami();
+        delete tami[name];     
     }
 }
 // document.getElementsByClassName('tami').addEventListener("click", function(){
@@ -140,7 +195,16 @@ document.getElementById('add').addEventListener("click", function(){
    
 });
 document.getElementById('kill').addEventListener("click", function(){
+    if(activeTami!== ''){
     Tami.killTami(activeTami);
+}
+});
+
+document.getElementById('sleep').addEventListener("click", function(){
+    if(activeTami!== ''){
+        Tami.goSleep(activeTami);
+    }
+    
 });
 
 tami = [new Tami('11 ')];
