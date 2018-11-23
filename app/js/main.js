@@ -17,11 +17,12 @@ class Tami{
     constructor(name) {
         this.name = name;
         this.id = tami.length;
+        this.tamiView = '';
         this.indicators= {
             health: {icon: '❤️', value: '100'},
             fullness:{icon: '🍔', value: '100'},
             strength: {icon: '💪', value: '100'},
-            happiness️️: {icon: '🎈', value: '101'},
+            happiness️️: {icon: '🎈', value: '100'},
         }
         this.action = {
             sleep: false,
@@ -29,9 +30,9 @@ class Tami{
             play: false,
             work: false,
         }
-        this.tamiShow();   
+        this.tamiCreate();   
       }
-    tamiShow(){        
+    tamiCreate(){        
         let main = document.getElementById("app");
         var tamiView = document.createElement("div");
         tamiView.className = "tami";
@@ -47,7 +48,8 @@ class Tami{
             let arr = this.className.split(" ");
             if (arr.indexOf(name) == -1) {
                 this.className += " " + name;
-            } 
+            }
+            Tami.error('');       
         });
 
         tamiView.setAttribute("id", this.id );
@@ -76,10 +78,35 @@ class Tami{
         tamiView.appendChild(lifeTimer);
         tamiView.appendChild(indicatorsList);
         main.appendChild(tamiView);
-        this.lifeTimer(1);
-    }  
+        this.tamiView = document.getElementById(this.id);
+        this.lifeTimer();
+    }
+    
+    emoji() {
+        if (this.indicators.health.value > 99 && this.indicators.fullness.value >= 100 && this.indicators.strength.value >= 100 && this.indicators.happiness️️.value > 100) {
+                this.tamiView.childNodes[1].innerHTML = '😻'; //Heart Eyes Cat
+            }
+        if (this.indicators.health.value < 100 && this.indicators.health.value > 80) {
+                this.tamiView.childNodes[1].innerHTML = '😸';  //    Smiling Eyes         
+            }
+        if (this.indicators.health.value <= 80 && this.indicators.health.value > 40 || this.indicators.happiness️️.value<50) {
+                this.tamiView.childNodes[1].innerHTML = '🐱';  // Cat Face            
+            }
+        if (this.indicators.health.value <= 40 && this.indicators.health.value > 20 || this.indicators.happiness️️.value < 30) {
+                this.tamiView.childNodes[1].innerHTML = '🙀';
+            }
+        if (this.indicators.health.value <= 20 && this.indicators.health.value > 3) {
+                this.tamiView.childNodes[1].innerHTML = '😿';
+            }
+        if (this.indicators.health.value <= 3) {
+                this.tamiView.childNodes[1].innerHTML = '💀';
+            }
+        if (this.action.sleep) {
+                this.tamiView.childNodes[1].innerHTML = '🛏️';
+            }
+    }
    
-    lifeTimer(params) {
+    lifeTimer() {
         let sec = 0;
         let id = this.id;
         let indicators =  this.indicators;
@@ -95,12 +122,17 @@ class Tami{
         setTimeout(timer, 1000);
     }
 
+    sleep(){
+        this.action.sleep = !this.action.action.sleep;           
+    }
+
     dieTami(){
         if(this.id==activeTami){            
             Tami.setActive();
         }        
         clearTimeout();
-        document.getElementById(this.id).remove();        
+        this.tamiView.remove();
+        delete tami[this.id];   
     }
     switchAction(active){
         Object.keys(this.action).map(function(objectKey, index) {
@@ -108,58 +140,96 @@ class Tami{
         });
         this.action[active] = true;
     }
+    fullnessControl(val){    
+        this.indicators.fullness.value -= val;
+        if (this.indicators.fullness.value>=0) {            
+            this.tamiView.childNodes[3].childNodes[1].innerHTML = this.indicators.fullness.icon + this.indicators.fullness.value;
+        }
+        if (this.indicators.fullness.value < 0){
+            this.indicators.fullness.value = 0;
+            this.tamiView.childNodes[3].childNodes[1].innerHTML = this.indicators.fullness.icon + 0;
+            this.healthControl(1);
+            this.happiness️️Control(10);
+        }
+    }
+    healthControl(val){      
+        this.indicators.health.value -= val;
+         if (this.indicators.health.value>100){
+             this.indicators.health.value = 100;
+        }
+        this.tamiView.childNodes[3].childNodes[0].innerHTML = this.indicators.health.icon + this.indicators.health.value;
+        this.emoji();
+        if (this.indicators.health.value==0){
+            this.dieTami();
+        } 
+    }
+    happiness️️Control(val){
+        this.indicators.happiness️️.value -= val;
+        if (this.indicators.happiness️️.value<=0){
+            this.healthControl(1);
+        }
+        if (this.indicators.happiness️️.value >= 100) {
+            this.emoji();
+        }
+
+        this.tamiView.childNodes[3].childNodes[3].innerHTML = this.indicators.happiness️️.icon + this.indicators.happiness️️.value;
+    }
+    strengthControl(val){
+        this.indicators.strength.value -= val;
+        if (this.indicators.strength.value <= 0) {
+            this.healthControl(1);
+            this.happiness️️Control(-1);
+        }
+        this.tamiView.childNodes[3].childNodes[2].innerHTML = this.indicators.strength.icon + this.indicators.strength.value;
+    }
+
+    work(){
+        this.fullnessControl(-10);
+        this.happiness️️Control(5);
+        this.strengthControl(5);
+        this.healthControl(5);
+    }
+
+    gym(){
+        this.fullnessControl(5);
+        this.healthControl(-1);
+        this.happiness️️Control(-1);
+        this.strengthControl(-5);
+    }
+
+    journey(){
+        this.fullnessControl(5);
+        this.healthControl(-3);
+        this.happiness️️Control(-5);
+        this.strengthControl(5);
+    }
+
     
     static health(sec,id){
         if(typeof tami[id] === 'object'){
-            if(sec%3===0 &&  !tami[id].action.sleep){
-                let clon = document.getElementById(id);
-                if(clon){
-                    tami[id].indicators.health.value -= 3;
-                    if(tami[id].indicators.health.value<0){
-                        Tami.killTami(id);
-                    }
-                    else{
-                        Tami.emoji(id);
-                        clon.childNodes[3].childNodes[0].innerHTML=tami[id].indicators.health.icon+tami[id].indicators.health.value;
-                    }                
-                }           
+            if(sec%3===0 &&  !tami[id].action.sleep){//not sleeping
+                tami[id].fullnessControl(3);
+                if (typeof tami[id] === 'object') {
+                    tami[id].happiness️️Control(1); 
+                }   
+                     
+            }
+            if (sec % 60 === 0 && tami[id].action.sleep) {
+                tami[id].fullnessControl(1);  //sleeping 
+                if (typeof tami[id] === 'object') {
+                    tami[id].happiness️️Control(-5);
+                    tami[id].strengthControl(-5);
+                }
+                     
             }      
         }
         
     }
 
-    static emoji (id){
-        let clon = document.getElementById(id);
-        if(clon){
-            if(tami[id].indicators.health.value>=100 && tami[id].indicators.fullness.value>=100 && tami[id].indicators.strength.value>=100 && tami[id].indicators.happiness️️.value>100  ) {
-                clon.childNodes[1].innerHTML= '😻'; //Heart Eyes Cat
-            }
-            if(tami[id].indicators.health.value<100 && tami[id].indicators.health.value>80 ){
-                clon.childNodes[1].innerHTML= '😸';  //    Smiling Eyes         
-            }
-            if(tami[id].indicators.health.value<=80 && tami[id].indicators.health.value>40 ){
-                clon.childNodes[1].innerHTML= '🐱';  // Cat Face            
-            }
-            if(tami[id].indicators.health.value<=40 && tami[id].indicators.health.value>20 ){
-                clon.childNodes[1].innerHTML= '🙀';
-            }
-            if(tami[id].indicators.health.value<=20 && tami[id].indicators.health.value>3 ){
-                clon.childNodes[1].innerHTML= '😿';
-            }
-            if(tami[id].indicators.health.value<=3){
-                clon.childNodes[1].innerHTML= '💀';
-            }
-            if(tami[id].action.sleep) {
-                clon.childNodes[1].innerHTML= '🛏️';
-            }
-            
-        }
-    }
-
     static setActive(id){
         if(id){           
              activeTami = id;
-        document.getElementById('active-name').innerHTML=tami[id].name;
+        document.getElementById('active-name').innerHTML=' whith '+ tami[id].name;
         }
         else{
             activeTami = ' ';
@@ -167,45 +237,114 @@ class Tami{
         }
     }
 
-    static goSleep(id){          
-        tami[id].action.sleep = !tami[id].action.sleep;       
-        Tami.emoji (id);
+    static sleepTami(name){          
+        tami[name].sleep();
     }
-
     static killTami(name){        
         tami[name].dieTami();
         delete tami[name];     
     }
-}
-// document.getElementsByClassName('tami').addEventListener("click", function(){
 
-//     console.log(this);
+    static feedTami(name) {
+        tami[name].fullnessControl(-5);
+    }
+    static cureTami(name) {        
+        tami[name].healthControl(-5);
+    }
+
+    static gymTami(name) {
+        tami[name].gym();
+    }
+
+    static journeyTami(name) {
+        tami[name].journey();
+    }
+
+    static workTami(name) {
+        tami[name].work();
+    }
+
     
-   
-// });
+
+    static error(error){
+        document.getElementById('error-handler').innerHTML = error;
+    }
+
+    
+}
+
 
 document.getElementById('add').addEventListener("click", function(){
 
     var person = prompt("Please enter tami name:", "Harry Potter");
     if (person !== null && person !== "") {
-        tami.push( new Tami(person));
-        console.log(tami.length);
-        
-    } 
+        tami.push( new Tami(person));  
+    }
+    
    
 });
 document.getElementById('kill').addEventListener("click", function(){
     if(activeTami!== ''){
-    Tami.killTami(activeTami);
-}
+        Tami.killTami(activeTami);
+    }
+    else {
+        Tami.error('select a frend');
+    }
 });
 
 document.getElementById('sleep').addEventListener("click", function(){
     if(activeTami!== ''){
-        Tami.goSleep(activeTami);
+        Tami.sleepTami(activeTami);
     }
-    
+    else {
+        Tami.error('select a frend');
+    }  
 });
 
-tami = [new Tami('11 ')];
+document.getElementById('feed').addEventListener("click", function () {
+    if (activeTami !== '') {
+        Tami.feedTami(activeTami);
+    }
+    else {
+        Tami.error('select a frend');
+    }  
+});
+
+document.getElementById('cure').addEventListener("click", function () {
+    if (activeTami !== '') {
+        Tami.cureTami(activeTami);
+    }
+    else {
+        Tami.error('select a frend');
+    }  
+});
+
+document.getElementById('gym').addEventListener("click", function () {
+    if (activeTami !== '') {
+        Tami.gymTami(activeTami);  
+    }
+    else {
+        Tami.error('select a frend');
+    }
+});
+
+document.getElementById('journey').addEventListener("click", function () {
+    if (activeTami !== '') {
+        Tami.journeyTami(activeTami);
+    }
+    else {
+        Tami.error('select a frend');
+    }
+});
+
+document.getElementById('work').addEventListener("click", function () {
+    if (activeTami !== '') {
+        Tami.workTami(activeTami);
+    }
+    else {
+        Tami.error('select a frend');
+    }
+});
+
+
 
