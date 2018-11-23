@@ -84,10 +84,10 @@ class Tami{
     }
     
     emoji() {
-        if (this.indicators.health.value > 99 && this.indicators.fullness.value >= 100 && this.indicators.strength.value >= 100 && this.indicators.happiness️️.value > 100) {
+        if (this.indicators.health.value >= 100 && this.indicators.fullness.value >= 100 && this.indicators.strength.value >= 100 && this.indicators.happiness️️.value > 100) {
                 this.tamiView.childNodes[1].innerHTML = '😻'; //Heart Eyes Cat
             }
-        if (this.indicators.health.value < 100 && this.indicators.health.value > 80) {
+        if (this.indicators.health.value <= 100 && this.indicators.health.value > 80) {
                 this.tamiView.childNodes[1].innerHTML = '😸';  //    Smiling Eyes         
             }
         if (this.indicators.health.value <= 80 && this.indicators.health.value > 40 || this.indicators.happiness️️.value<50) {
@@ -123,7 +123,7 @@ class Tami{
         setTimeout(timer, 1000);
     }
 
-    sleep(){
+    sleep(){       
         this.action.sleep = !this.action.sleep;
         this.emoji();
     }
@@ -186,6 +186,7 @@ class Tami{
     }
 
     work(){
+        this.action.sleep = false;
         this.fullnessControl(-10);
         this.happiness️️Control(5);
         this.strengthControl(5);
@@ -193,6 +194,7 @@ class Tami{
     }
 
     gym(){
+        this.action.sleep = false;
         this.fullnessControl(5);
         this.healthControl(-1);
         this.happiness️️Control(-1);
@@ -200,6 +202,7 @@ class Tami{
     }
 
     journey(){
+        this.action.sleep = false;
         this.fullnessControl(5);
         this.healthControl(-3);
         this.happiness️️Control(-5);
@@ -216,7 +219,7 @@ class Tami{
                 }   
                      
             }
-            if (sec % 60 === 0 && tami[id].action.sleep) {
+            if (typeof tami[id] === 'object' && sec % 60 === 0 && tami[id].action.sleep) {
                 tami[id].fullnessControl(1);  //sleeping 
                 if (typeof tami[id] === 'object') {
                     tami[id].happiness️️Control(-5);
@@ -377,6 +380,7 @@ document.getElementById('work').addEventListener("click", function () {
         Tami.error('select a frend');
     }
 });
+
 
 
 
