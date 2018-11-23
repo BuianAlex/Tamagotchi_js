@@ -124,13 +124,12 @@ class Tami{
     }
 
     sleep(){
-        this.action.sleep = !this.action.action.sleep;           
+        this.action.sleep = !this.action.sleep;
+        this.emoji();
     }
 
     dieTami(){
-        if(this.id==activeTami){ 
-            console.log(activeTami);
-                       
+        if(this.id==activeTami){          
             Tami.setActive();
         }        
         clearTimeout();
