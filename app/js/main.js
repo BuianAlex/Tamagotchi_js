@@ -79,6 +79,7 @@ class Tami{
         tamiView.appendChild(indicatorsList);
         main.appendChild(tamiView);
         this.tamiView = document.getElementById(this.id);
+        Tami.error('');
         this.lifeTimer();
     }
     
@@ -127,7 +128,9 @@ class Tami{
     }
 
     dieTami(){
-        if(this.id==activeTami){            
+        if(this.id==activeTami){ 
+            console.log(activeTami);
+                       
             Tami.setActive();
         }        
         clearTimeout();
@@ -232,7 +235,7 @@ class Tami{
         document.getElementById('active-name').innerHTML=' whith '+ tami[id].name;
         }
         else{
-            activeTami = ' ';
+            activeTami = '';
             document.getElementById('active-name').innerHTML=' ';
         }
     }
@@ -240,28 +243,58 @@ class Tami{
     static sleepTami(name){          
         tami[name].sleep();
     }
-    static killTami(name){        
-        tami[name].dieTami();
-        delete tami[name];     
+    static killTami(name){
+        if (tami[name]){
+            tami[name].dieTami();
+            delete tami[name];
+        }
+        else{
+            Tami.error('nobody to kill');
+        }                   
     }
 
     static feedTami(name) {
-        tami[name].fullnessControl(-5);
+        if (tami[name]) {
+            tami[name].fullnessControl(-5);
+        }
+        else {
+            Tami.error('Create a frend');
+        } 
     }
-    static cureTami(name) {        
+    static cureTami(name) {
+        if (tami[name]) {        
         tami[name].healthControl(-5);
+        }
+        else {
+            Tami.error('Create a frend');
+        } 
     }
 
     static gymTami(name) {
-        tami[name].gym();
+        if (tami[name]) {
+            tami[name].gym();
+        }
+        else {
+            Tami.error('Create a frend');
+        } 
     }
 
     static journeyTami(name) {
-        tami[name].journey();
+        if (tami[name]) {
+            tami[name].journey();
+        }
+        else {
+            Tami.error('Create a frend');
+        } 
     }
 
     static workTami(name) {
-        tami[name].work();
+        if (tami[name]) {
+            tami[name].work();
+        }
+        else {
+            Tami.error('Create a frend');
+        } 
     }
 
     
@@ -284,11 +317,11 @@ document.getElementById('add').addEventListener("click", function(){
    
 });
 document.getElementById('kill').addEventListener("click", function(){
-    if(activeTami!== ''){
+    if(activeTami!==''){
         Tami.killTami(activeTami);
     }
     else {
-        Tami.error('select a frend');
+        Tami.error('nobody to kill');
     }
 });
 
